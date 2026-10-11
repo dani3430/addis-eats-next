@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* The app is designed as a light theme, so ignore the OS dark mode. */
+:root {
+  color-scheme: light;
+}  
