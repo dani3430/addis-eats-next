@@ -1,7 +1,5 @@
 import { getDishes } from "@/lib/dishes";
-
-// Placeholder production URL from the sheet; we swap it for the real one when we deploy (Day 48).
-const SITE_URL = "https://addiseats.et";
+import { SITE_URL } from "@/lib/site";
 
 export default async function sitemap() {
   const dishes = await getDishes();

@@ -3,12 +3,11 @@ import Link from "next/link";
 import Providers from "@/components/Providers";
 import AccountStatus from "@/components/AccountStatus";
 import { Inter } from "next/font/google";
-
+import { SITE_URL } from "@/lib/site";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata = {
-  // Placeholder production URL from the sheet; we swap it for the real one when we deploy (Day 48).
-  metadataBase: new URL("https://addiseats.et"),
+    metadataBase: new URL(SITE_URL),
   title: {
     template: "%s · Addis Eats",
     default: "Addis Eats — food delivery in Addis Ababa",
