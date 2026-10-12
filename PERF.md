@@ -72,13 +72,13 @@ Conclusion: the font is not the cause. The differences are smaller than the run-
 
 ## Day 45: performance budget
 
-| Measure                            | Target       | Before (Day 43 baseline)                                  | Day 45 start                                         | After (local production build)     | After (deployed)  |
-| ---------------------------------- | ------------ | --------------------------------------------------------- | ---------------------------------------------------- | ---------------------------------- | ----------------- |
-| LCP, throttled (home page)         | under 2.5 s  | 6.1 s                                                     | 3.3 s (median of 3; range 1.7 to 3.4 s)              | 2.9 s (median of 3: 2.6, 3.0, 2.9) | to fill in Step 8 |
-| CLS                                | under 0.1    | 0                                                         | 0                                                    | 0                                  | to fill in Step 8 |
-| JavaScript downloaded on `/menu`   | under 120 kB | not recorded                                              | 171 kB                                               | 171 kB                             | to fill in Step 8 |
-| Largest image served               | under 150 kB | 1.2 MB (the original hero file; served size not recorded) | 66.0 kB (hero on `/`); 52.7 kB (doro-wat on `/menu`) | 66.0 kB (hero on `/`)              | to fill in Step 8 |
-| Lighthouse performance (home page) | 90 or better | 71                                                        | 92 (best run 94)                                     | 87                                 | to fill in Step 8 |
+| Measure                            | Target       | Before (Day 43 baseline)                                  | Day 45 start                                         | After (local production build)     | After (deployed on Vercel)         |
+| ---------------------------------- | ------------ | --------------------------------------------------------- | ---------------------------------------------------- | ---------------------------------- | ---------------------------------- |
+| LCP, throttled (home page)         | under 2.5 s  | 6.1 s                                                     | 3.3 s (median of 3; range 1.7 to 3.4 s)              | 2.9 s (median of 3: 2.6, 3.0, 2.9) | 1.8 s (median of 3: 1.3, 1.8, 2.6) |
+| CLS                                | under 0.1    | 0                                                         | 0                                                    | 0                                  | 0                                  |
+| JavaScript downloaded on `/menu`   | under 120 kB | not recorded                                              | 171 kB                                               | 171 kB                             | 173 kB                             |
+| Largest image served               | under 150 kB | 1.2 MB (the original hero file; served size not recorded) | 66.0 kB (hero on `/`); 52.7 kB (doro-wat on `/menu`) | 66.0 kB (hero on `/`)              | XX kB                              |
+| Lighthouse performance (home page) | 90 or better | 71                                                        | 92 (best run 94)                                     | 87                                 | 94                                 |
 
 How these were measured:
 
@@ -88,11 +88,11 @@ How these were measured:
 
 ### What changed each number
 
-- **LCP, 6.1 s to about 2.9 s:** the biggest change was replacing the oversized hero file (a 2500x2500 PNG saved as `.jpg`, 1.2 MB) with a real 1600x1600 JPEG. Adding `sizes` cut the page weight from 1.2 MB to about 600 kB. Adding `fetchPriority="high"` to the hero moved the median LCP from 3.3 s to 2.9 s, after Lighthouse reported that the image was discoverable but not marked high priority.
+- - **LCP, 6.1 s to 2.9 s locally and 1.8 s deployed:** the biggest change was replacing the oversized hero file (a 2500x2500 PNG saved as `.jpg`, 1.2 MB) with a real 1600x1600 JPEG. Adding `sizes` cut the page weight from 1.2 MB to about 600 kB. Adding `fetchPriority="high"` to the hero moved the median LCP from 3.3 s to 2.9 s, after Lighthouse reported that the image was discoverable but not marked high priority.
 - **Largest image:** met. The served hero is 66.0 kB against a 150 kB limit.
 - **CLS:** met in every run. The images have `width` and `height`, and the font is loaded with `next/font`.
 
 ### Targets not met, and why
 
-- **LCP (2.9 s against 2.5 s).** I could not bring it under the target on this machine. Lighthouse's simulated slow-phone estimate varies by about half a second between identical runs here. The unthrottled breakdown on the laptop is tiny (time to first byte 10 ms, resource load delay 30 ms, load duration 10 ms, element render delay 130 ms), so the remaining time comes from the simulation, not from a slow resource. I will re-measure on the deployed build, where a real server and CDN replace `localhost`.
+- **LCP on my local build (2.9 s against 2.5 s).** I could not bring it under the target locally. Lighthouse's simulated slow-phone estimate varies by about half a second between identical runs on my laptop, and the unthrottled breakdown was tiny (time to first byte 10 ms, resource load delay 30 ms, load duration 10 ms, element render delay 130 ms), so the remaining time came from the simulation. On the deployed site the median is 1.8 s, which meets the target.
 - **JavaScript on `/menu` (171 kB against 120 kB).** This cannot be reached by changing Addis Eats's own code. I compared three pages with very different amounts of my own code: `/` sends 165 kB, `/cart` 171 kB and `/menu` 171 kB, so only 6 kB separate them. The three largest files on `/menu` are 72, 36 and 10 kB (118 kB together), which are the shared framework chunks (most likely React and the Next.js client runtime) that every Next.js page ships before any application code.
